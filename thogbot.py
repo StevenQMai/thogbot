@@ -20,10 +20,8 @@ NAME = "thog"
 tuco_getout = "https://media.discordapp.net/attachments/955285900466724895/1266506597824335882/v0f044gc0000choio6rc77u9ihvg2mm0.mov?ex=66cc49ef&is=66caf86f&hm=a9e2ef50cf8c8010edad5425584ab6d1a6e84d69be9fce0e999f52c962170eab&"
 tuco_getout_mp3 = "/Users/stevenmai/Downloads/tuco_getout.mp3"
 
-
 # Initialize a queue for managing songs
 song_queue = deque()
-
 
 @dataclass
 class Session:
@@ -56,7 +54,6 @@ def get_command_list():
         "**!commandslist** - Lists all available commands."
     ]
     return "\n".join(commands_list)
-
 
 
 
@@ -160,6 +157,7 @@ async def multiply(ctx, *arr):
 
 @bot.command(
     name='divide',
+
     description='Performs division, accepts arrays',
     pass_context=True,
 )
@@ -221,6 +219,8 @@ async def end(ctx):
     description='GET OUT',
     pass_context=True,
 )
+
+
 async def tuco(ctx, arg=None):
     """
     if arg == "1":
@@ -241,7 +241,6 @@ async def get_out(ctx, arg=None):
     if arg == None:
         await ctx.send(tuco_getout)
     
-
 
 @bot.command(
     name='vc',
@@ -295,18 +294,22 @@ async def play(ctx, url=None):
     await ctx.send(f"Now playing: {url}")
 """
 
-
 @bot.command(
     name="guess",
     description="Randomly kicks a member from the server; good riddance",
     pass_context=True
 )
 
+
 async def guess(ctx, guess:int):
     if guess < 1 or 5 < guess:
         await ctx.send("It's gotta be between 1 and 5 pal")
         return
     random_number = random.randint(1,5)
+async def randomkick(ctx, guess):
+    await ctx.send("Guess a number 1-10")
+    random_number = int(input(random.randint(1,10)))
+    guess = int(input())
 
     if guess == random_number:
         await bot.kick(reason="Unlucky")
@@ -444,8 +447,6 @@ async def stop(ctx):
 
     song_queue.clear()
     await ctx.send("Playback stopped and queue cleared!")
-
-
 
 
 
