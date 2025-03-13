@@ -1,4 +1,4 @@
-# thogbot
+# thogbot (OUTDATED - WIP)
 A multi-purpose Discord bot! He's a versatile Discord bot that provides various utilities and entertainment features.
 
 ## Table of Contents
