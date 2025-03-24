@@ -1,0 +1,52 @@
+server: # REST and WS server
+  port: 2333
+  address: 127.0.0.1
+lavalink:
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: true
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      http: true
+    bufferDurationMs: 400
+    youtubePlaylistLoadLimit: 6
+    playerUpdateInterval: 5
+    youtubeSearchEnabled: true
+    soundcloudSearchEnabled: true
+    gc-warnings: true
+    youtubeConfig:
+      playlistLoadLimit: 6
+      searchResults: 10
+      maxRetries: 3
+      useISRC: true
+      useSearchSuggestion: true
+      useSearchPlaylist: true
+      useSearchVideo: true
+      useSearchChannel: true
+    httpConfig:
+      proxyHost: "" # Optional
+      proxyPort: 3128 # Optional
+      proxyUser: "" # Optional
+      proxyPassword: "" # Optional
+    opusEncoderSettings:
+      frameDuration: 20 # 20, 40, 60 ms
+      bufferSize: 512 # 256, 512, 1024, 2048 bytes
+      bitrate: 128000 # 32000 to 512000 bps
+    resamplingQuality: LOW # LOW, MEDIUM, HIGH, BEST
+    trackStuckThresholdMs: 10000
+    useSeekGhosting: true
+    filters:
+      volume: true
+      equalizer: true
+      karaoke: true
+      timescale: true
+      tremolo: true
+      vibrato: true
+    frameBufferDurationMs: 1000
+    metrics:
+      prometheus:
+        enabled: false
+        endpoint: /metrics 
