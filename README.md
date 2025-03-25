@@ -47,6 +47,3 @@ A Discord bot that helps users manage their tasks and productivity within Discor
 - aiosqlite
 - pytz
 
-## License
-
-MIT License
