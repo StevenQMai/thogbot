@@ -12,7 +12,7 @@ class Tasks(commands.Cog):
 
     @app_commands.command(name="taskhelp", description="Get help on how to use the task manager")
     async def taskhelp(self, interaction: discord.Interaction):
-        """Show help information about how to use the task manager."""
+        """Show help information about how to use the task manager commands."""
         embed = discord.Embed(
             title="📋 Task Manager Help Guide",
             description="Here's how to use the task manager commands:",
@@ -85,6 +85,8 @@ class Tasks(commands.Cog):
     async def add_task(self, interaction: discord.Interaction, title: str, description: str, 
                       due_date: str, priority: str, assignee: discord.Member = None):
         """Add a new task with title, description, due date, priority, and optional assignee."""
+        print(f"Received add_task command for: {title}")  # Debug log
+        
         # Validate priority
         if priority.lower() not in ['low', 'medium', 'high']:
             await interaction.response.send_message("Priority must be 'low', 'medium', or 'high", ephemeral=True)
@@ -98,30 +100,37 @@ class Tasks(commands.Cog):
             await interaction.response.send_message("Invalid date format. Please use YYYY-MM-DD HH:MM", ephemeral=True)
             return
 
-        # Add task to database
-        task_id = await self.db.add_task(
-            title=title,
-            description=description,
-            due_date=due_date,
-            priority=priority.lower(),
-            created_by=interaction.user.id,
-            assigned_to=assignee.id if assignee else None
-        )
+        try:
+            # Add task to database
+            task_id = await self.db.add_task(
+                title=title,
+                description=description,
+                due_date=due_date,
+                priority=priority.lower(),
+                created_by=interaction.user.id,
+                assigned_to=assignee.id if assignee else None
+            )
+            print(f"Task created with ID: {task_id}")  # Debug log
 
-        # Create embed for response
-        embed = discord.Embed(
-            title="Task Created",
-            description=f"Task ID: {task_id}",
-            color=discord.Color.green()
-        )
-        embed.add_field(name="Title", value=title, inline=False)
-        embed.add_field(name="Description", value=description, inline=False)
-        embed.add_field(name="Due Date", value=due_date, inline=True)
-        embed.add_field(name="Priority", value=priority.capitalize(), inline=True)
-        if assignee:
-            embed.add_field(name="Assigned To", value=assignee.mention, inline=True)
+            # Create embed for response
+            embed = discord.Embed(
+                title="Task Created",
+                description=f"Task ID: {task_id}",
+                color=discord.Color.green()
+            )
+            embed.add_field(name="Title", value=title, inline=False)
+            embed.add_field(name="Description", value=description, inline=False)
+            embed.add_field(name="Due Date", value=due_date, inline=True)
+            embed.add_field(name="Priority", value=priority.capitalize(), inline=True)
+            if assignee:
+                embed.add_field(name="Assigned To", value=assignee.mention, inline=True)
 
-        await interaction.response.send_message(embed=embed)
+            # Send the response
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            print(f"Error in add_task command: {e}")  # Debug log
+            if not interaction.response.is_done():
+                await interaction.response.send_message("An error occurred while creating the task.", ephemeral=True)
 
     @app_commands.command(name="tasks", description="View your tasks")
     async def view_tasks(self, interaction: discord.Interaction, status: str = None):

@@ -22,7 +22,8 @@ class Database:
                     created_by INTEGER NOT NULL,
                     assigned_to INTEGER,
                     created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(title, description, due_date, created_by)
                 )
             """)
             await db.commit()
@@ -30,13 +31,32 @@ class Database:
     async def add_task(self, title, description, due_date, priority, created_by, assigned_to=None):
         """Add a new task to the database."""
         now = datetime.now(pytz.UTC).isoformat()
+        print(f"Adding task: {title}")  # Debug log
         async with aiosqlite.connect(self.db_path) as db:
-            cursor = await db.execute("""
-                INSERT INTO tasks (title, description, due_date, priority, status, created_by, assigned_to, created_at, updated_at)
-                VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)
-            """, (title, description, due_date, priority, created_by, assigned_to, now, now))
-            await db.commit()
-            return cursor.lastrowid
+            try:
+                # First check if a similar task exists
+                cursor = await db.execute("""
+                    SELECT id FROM tasks 
+                    WHERE title = ? AND description = ? AND due_date = ? AND created_by = ?
+                """, (title, description, due_date, created_by))
+                existing_task = await cursor.fetchone()
+                
+                if existing_task:
+                    print(f"Task already exists with ID: {existing_task[0]}")  # Debug log
+                    return existing_task[0]
+
+                # If no existing task, insert new one
+                cursor = await db.execute("""
+                    INSERT INTO tasks (title, description, due_date, priority, status, created_by, assigned_to, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+                """, (title, description, due_date, priority, created_by, assigned_to, now, now))
+                await db.commit()
+                task_id = cursor.lastrowid
+                print(f"Task added successfully with ID: {task_id}")  # Debug log
+                return task_id
+            except Exception as e:
+                print(f"Error adding task: {e}")  # Debug log
+                raise
 
     async def get_task(self, task_id):
         """Get a task by its ID."""
@@ -54,7 +74,7 @@ class Database:
             if status:
                 cursor = await db.execute("""
                     SELECT * FROM tasks 
-                    WHERE created_by = ? OR assigned_to = ?
+                    WHERE (created_by = ? OR assigned_to = ?)
                     AND status = ?
                     ORDER BY due_date ASC
                 """, (user_id, user_id, status))
